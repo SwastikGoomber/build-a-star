@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Perfection Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>⚠️ Draw a PERFECT Star... If You Can ⚠️</h1>
+        <div id="game-ui">
+            <canvas id="gameCanvas"></canvas>
+            <div id="roast-display"></div>
+            <div class="controls">
+                <button id="tryAgain">Try Again? (Obviously)</button>
+            </div>
+        </div>
+        <div class="stats">
+            <span id="perfectCounter">Perfect Stars: 0</span>
+            <span id="attemptCounter">Attempts: 0</span>
+        </div>
+    </div>
+    <script type="module" src="config.js"></script>
+    <script type="module" src="roasts.js"></script>
+    <script type="module" src="geometry.js"></script>
+    <script type="module" src="game.js"></script>
+</body>
+
+</html>
