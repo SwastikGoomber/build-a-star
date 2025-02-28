@@ -133,7 +133,7 @@ function endDrawing() {
     handleResult(result);
     updateCounters();
     scoreGiven = true; // Mark that a score has been given
-  }, 500);
+  }, 1500);
   
   lastDrawingTime = Date.now();
 }
