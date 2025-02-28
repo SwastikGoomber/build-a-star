@@ -62,9 +62,11 @@ window.addEventListener('resize', resizeCanvas);
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', endDrawing);
+canvas.addEventListener('mouseleave', endDrawing);
 canvas.addEventListener('touchstart', handleTouchStart);
 canvas.addEventListener('touchmove', handleTouchMove);
 canvas.addEventListener('touchend', handleTouchEnd);
+canvas.addEventListener('touchcancel', endDrawing);
 tryAgainButton.addEventListener('click', () => resetCanvas(true));
 
 // Touch support
