@@ -5,6 +5,13 @@ const roastDisplay = document.getElementById('roast-display');
 const tryAgainButton = document.getElementById('tryAgain');
 const perfectCounter = document.getElementById('perfectCounter');
 const attemptCounter = document.getElementById('attemptCounter');
+const startGameButton = document.getElementById('start-game');
+const introScreen = document.getElementById('intro-screen');
+
+// Handle intro screen
+startGameButton.addEventListener('click', () => {
+    introScreen.classList.add('intro-hidden');
+});
 
 import { CONFIG } from './config.js';
 import { ROASTS } from './roasts.js';
@@ -133,7 +140,7 @@ function endDrawing() {
     handleResult(result);
     updateCounters();
     scoreGiven = true; // Mark that a score has been given
-  }, 1500);
+  }, 1000);
   
   lastDrawingTime = Date.now();
 }
