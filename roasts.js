@@ -73,6 +73,7 @@ export const ROASTS = {
 
     ],
     perfect: [
+    //"perfect star"
     "You actually fucking did it! It… it looks like a star! (kinda) Go touch grass, moron, get out of the fucking basement.",
     "Oh damn! You finally drew a star! You know what? Fuck you anyway! You weren’t supposed to draw it perfectly!",
     "Holy shit, you made a decent star. Now go make some real life achievements, nerd.",
