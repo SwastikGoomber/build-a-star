@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Star Perfection Simulator</title>
+    <title>Build-A-Star</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -32,8 +32,17 @@
             </div>
         </div>
         <div class="stats">
-            <span id="perfectCounter">Perfect Stars: 0</span>
-            <span id="attemptCounter">Attempts: 0</span>
+            <div class="stats-section">
+                <h3>Current Session</h3>
+                <span id="sessionAttempts">Attempts: 0</span>
+                <span id="sessionPerfect">Perfect Stars: 0</span>
+            </div>
+            <div class="stats-divider"></div>
+            <div class="stats-section">
+                <h3>All Time</h3>
+                <span id="totalAttempts">Total Attempts: 0</span>
+                <span id="totalPerfect">Perfect Stars: 0</span>
+            </div>
         </div>
     </div>
     <script type="module" src="config.js"></script>

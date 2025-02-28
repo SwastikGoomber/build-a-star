@@ -3,8 +3,10 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const roastDisplay = document.getElementById('roast-display');
 const tryAgainButton = document.getElementById('tryAgain');
-const perfectCounter = document.getElementById('perfectCounter');
-const attemptCounter = document.getElementById('attemptCounter');
+const sessionAttempts = document.getElementById('sessionAttempts');
+const sessionPerfect = document.getElementById('sessionPerfect');
+const totalAttempts = document.getElementById('totalAttempts');
+const totalPerfect = document.getElementById('totalPerfect');
 const startGameButton = document.getElementById('start-game');
 const introScreen = document.getElementById('intro-screen');
 
@@ -20,9 +22,25 @@ import {
   downsamplePath
 } from './geometry.js';
 
+// Initialize stats
+const savedStats = JSON.parse(localStorage.getItem('starGameStats')) || {
+    allTime: {
+        perfectStars: 0,
+        totalAttempts: 0,
+        bestAttemptStreak: 0
+    }
+};
+
+// Always start with fresh session stats
+let stats = {
+    allTime: savedStats.allTime,
+    session: {
+        perfectStars: 0,
+        attempts: 0
+    }
+};
+
 let currentPath = [];
-let attempts = 0;
-let perfectStars = 0;
 let isDrawing = false;
 let validationTimeout;
 let lastDrawingTime = 0;
@@ -47,7 +65,7 @@ canvas.addEventListener('mouseup', endDrawing);
 canvas.addEventListener('touchstart', handleTouchStart);
 canvas.addEventListener('touchmove', handleTouchMove);
 canvas.addEventListener('touchend', handleTouchEnd);
-tryAgainButton.addEventListener('click', resetCanvas);
+tryAgainButton.addEventListener('click', () => resetCanvas(true));
 
 // Touch support
 function handleTouchStart(e) {
@@ -83,7 +101,7 @@ function startDrawing(e) {
   // 2. More than 2 seconds have passed since last drawing
   const currentTime = Date.now();
   if (currentPath.length > 0 && (scoreGiven || (currentTime - lastDrawingTime > 2000))) {
-    resetCanvas();
+    resetCanvas(false); // Reset without animation
   }
   
   isDrawing = true;
@@ -138,7 +156,7 @@ function endDrawing() {
   validationTimeout = setTimeout(() => {
     const result = validateStar();
     handleResult(result);
-    updateCounters();
+    updateCounters(true); // Update with animation
     scoreGiven = true; // Mark that a score has been given
   }, 1000);
   
@@ -162,7 +180,7 @@ function validateStar() {
   // Determine which roast to use based on perfection score
   let message;
   if (perfection >= CONFIG.PERFECT_THRESHOLD) {
-    message = getRandomRoast(ROASTS.perfect).replace('%a', attempts);
+    message = getRandomRoast(ROASTS.perfect).replace('%a', stats.session.attempts);
   } else if (perfection >= CONFIG.GOOD_THRESHOLD) {
     message = getRandomRoast(ROASTS.good_star);
   } else {
@@ -192,15 +210,23 @@ function handleResult(result) {
   
   if (result.valid) {
     if (result.perfection >= CONFIG.PERFECT_THRESHOLD) {
-      perfectStars++;
-      attempts = 0;
+      stats.session.perfectStars++;
+      stats.allTime.perfectStars++;
+      stats.session.attempts = 0; // Reset session attempts on perfect star
+      
+      // Update best streak if current is better
+      if (stats.session.attempts < stats.allTime.bestAttemptStreak || stats.allTime.bestAttemptStreak === 0) {
+        stats.allTime.bestAttemptStreak = stats.session.attempts;
+      }
+      
       triggerConfetti();
       canvas.classList.add('perfect-glow');
       setTimeout(() => {
         canvas.classList.remove('perfect-glow');
       }, 2000);
     } else {
-      attempts++;
+      stats.session.attempts++;
+      stats.allTime.totalAttempts++;
       
       // Add shake animation for non-perfect stars
       if (result.perfection < CONFIG.GOOD_THRESHOLD) {
@@ -211,7 +237,8 @@ function handleResult(result) {
       }
     }
   } else {
-    attempts++;
+    stats.session.attempts++;
+    stats.allTime.totalAttempts++;
     // Add shake animation for non-stars
     canvas.classList.add('shake');
     setTimeout(() => {
@@ -227,29 +254,35 @@ function handleResult(result) {
   }, 1000);
 }
 
-function resetCanvas() {
+function resetCanvas(animate = false) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  updateCounters();
+  updateCounters(animate);
   tryAgainButton.classList.remove('visible');
   roastDisplay.textContent = '';
   currentPath = [];
   scoreGiven = false; // Reset score given flag
 }
 
-function updateCounters() {
-  attemptCounter.textContent = `Attempts: ${attempts}`;
-  perfectCounter.textContent = `Perfect: ${perfectStars}`;
+function updateCounters(animate = false) {
+  sessionAttempts.textContent = `Attempts: ${stats.session.attempts}`;
+  sessionPerfect.textContent = `Perfect Stars: ${stats.session.perfectStars}`;
+  totalAttempts.textContent = `Total Attempts: ${stats.allTime.totalAttempts}`;
+  totalPerfect.textContent = `Perfect Stars: ${stats.allTime.perfectStars}`;
   
-  // Add animation to counters when they update
-  attemptCounter.classList.add('counter-update');
-  perfectCounter.classList.add('counter-update');
+  // Save to localStorage (only save allTime stats)
+  localStorage.setItem('starGameStats', JSON.stringify({ allTime: stats.allTime }));
   
-  setTimeout(() => {
-    attemptCounter.classList.remove('counter-update');
-    perfectCounter.classList.remove('counter-update');
-  }, 300);
+  // Only animate if specified
+  if (animate) {
+    const counters = [sessionAttempts, sessionPerfect, totalAttempts, totalPerfect];
+    counters.forEach(counter => counter.classList.add('counter-update'));
+    
+    setTimeout(() => {
+      counters.forEach(counter => counter.classList.remove('counter-update'));
+    }, 300);
+  }
 }
 
 function createDrawingParticle(x, y) {
@@ -287,3 +320,6 @@ function triggerConfetti() {
     setTimeout(() => confetti.remove(), 5000);
   }
 }
+
+// Initialize counters on page load without animation
+updateCounters(false);
